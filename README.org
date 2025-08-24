@@ -1,0 +1,22 @@
+#+OPTIONS: ^:nil
+* Tanker mens jeg løser oppgaven
+** Initielle observasjoner og antagelser
+input er en csv fil, output er en rapport. Jeg velger å tolke rapport
+som en fil som skal leses av mennesker. Det er en vid tolkning som gir
+meg rom i starten til å utforske.
+
+Det er krav til hvordan systemet skal fungere, basert på dataformatet
+- innbruddsdato *skal* ha formatet YYYY-MM-DD, ugyldig format skal ikke
+  med i datasettet.
+- hvis innbruddsdato mangler, skal en benytte datoen fra mottatt_tid.
+- systemet skal ikke påvirkes av dobbeltregistrering, som blir
+  definert som identiske rader i oppgaveteksten. Jeg vil derfor
+  *akseptere* registreringer som har samme mottatt_tid og stedsnavn, men
+  NULL og gyldig dato som innbruddsdato. For eksempel vil radene
+
+  2025-04-04T21:10:00Z,2025-04-04,Bislett \\
+  2025-04-04T21:10:00Z,,Bislett
+
+  bli godtatt, selv om begge vil bli like registreringer etter at
+  dato har blitt tatt fra mottatt_tid.
+
