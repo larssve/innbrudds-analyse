@@ -7,7 +7,7 @@ SELECT mottatt_tid,
 			 LOWER(stedsnavn)
 FROM (
 SELECT DISTINCT(*)
-FROM READ_CSV('innbruddstips-eksempel.csv',
+FROM READ_CSV($csv_file,
 							dateformat = '%Y-%m-%d',
 							columns = {'mottatt_tid': 'TIMESTAMPTZ', 'innbruddsdato': 'DATE', 'stedsnavn': 'VARCHAR'},
 							-- krav om å hoppe over feil i datoformat
