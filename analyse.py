@@ -11,7 +11,7 @@ def hotspots(con):
     return sql_from_file("sql/hotspots.sql", con)
 
 def trends(con):
-    vprint("[*] Starting hotspot analysis")
+    vprint("[*] Starting trend analysis")
     return sql_from_file("sql/trends.sql", con)
 
 def sql_from_file(filename, con):
