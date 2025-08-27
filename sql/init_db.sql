@@ -4,7 +4,7 @@ SELECT mottatt_tid,
 					WHEN innbruddsdato IS NOT NULL THEN innbruddsdato
 			 		ELSE DATE(mottatt_tid)
 			 END AS innbruddsdato,
-			 LOWER(stedsnavn)
+			 LOWER(stedsnavn) AS stedsnavn
 FROM (
 SELECT DISTINCT(*)
 FROM READ_CSV($csv_file,
