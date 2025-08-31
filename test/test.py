@@ -64,3 +64,24 @@ class TestRequirements(unittest.TestCase):
                 expected = 1
                 self.assertEqual(actual, expected)
 
+    def test_duplicates_with_null_date(self):
+        """
+        Rows are only duplicates if the entire row is the same in the csv file
+        """
+        test_file = "test/test-duplicates.csv"
+
+        with open(INIT_DB, "r") as sql_file:
+            sql = sql_file.read()
+
+            with open(test_file, "w") as csvfile:
+                w = csv.writer(csvfile)
+                w.writerow(["mottatt_tid", "innbruddsdato", "stedsnavn"])
+                w.writerow(["2025-04-04T21:10:00Z","2025-04-04","Bislett"])
+                w.writerow(["2025-04-04T21:10:00Z",None,"Bislett"])
+
+            with duckdb.connect() as con:
+                con.execute(sql, {"csv_file": test_file})
+
+                actual, = con.sql("SELECT COUNT(*) FROM innbruddstips").fetchone()
+                expected = 2
+                self.assertEqual(actual, expected)
