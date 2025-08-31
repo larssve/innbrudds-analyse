@@ -12,23 +12,25 @@ logger = logging.getLogger(__name__)
 
 def hotspots(con):
     logger.debug("Starting hotspot analysis")
-    return sql_from_file("sql/hotspots.sql", con)
+    return sql_from_file("sql/hotspots.sql", con), "hotspots"
 
 def trends(con):
     logger.debug("Starting trend analysis")
-    return sql_from_file("sql/trends.sql", con)
+    return sql_from_file("sql/trends.sql", con), "trends"
 
 def sql_from_file(filename, con):
     with open(filename, "r") as f:
         return con.sql(f.read())
 
-def handle_default(df):
-    logging.debug("handle_default")
+def output_default(analysis):
+    logging.debug("output_default")
+    df,_ = analysis
     df.show()
     
-def handle_csv(df):
-    logging.debug("handle_csv")
-    df.show()
+def output_csv(analysis):
+    logging.debug("output_csv")
+    df,filename = analysis
+    df.to_csv(f"{filename}.csv")
 
 
 if __name__ == "__main__":
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     parser.add_argument("filename")
     parser.add_argument("-v", "--verbose", action="store_const", const=logging.DEBUG, default=logging.INFO)
     output_group = parser.add_mutually_exclusive_group()
-    output_group.add_argument("--csv", action="store_const", const=handle_csv, default=handle_default, dest="output")
+    output_group.add_argument("--csv", action="store_const", const=output_csv, default=output_default, dest="output")
 
     args = parser.parse_args()
     logging.basicConfig(level=args.verbose)
