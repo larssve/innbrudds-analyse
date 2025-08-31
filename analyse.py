@@ -1,9 +1,10 @@
-#!venv/bin/python3
+#!venv/bin/python
 import argparse
 import duckdb
 import logging
 import os
 import sys
+import pandas
 
 DB_FILE = "db.duck"
 INIT_DB = "sql/init_db.sql"
@@ -22,15 +23,25 @@ def sql_from_file(filename, con):
     with open(filename, "r") as f:
         return con.sql(f.read())
 
-def output_default(analysis):
-    logging.debug("output_default")
-    df,_ = analysis
-    df.show()
+## output handlers
+def output_default(analyses):
+    logger.debug("output default")
+    for df,_ in analyses:
+        df.show()
     
-def output_csv(analysis):
-    logging.debug("output_csv")
-    df,filename = analysis
-    df.to_csv(f"{filename}.csv")
+def output_csv(analyses):
+    logging.debug("output csv")
+    for df,filename in analyses:
+        logger.info(f"Skriver analyse til {filename}.csv")
+        df.to_csv(f"{filename}.csv")
+
+def output_excel(analyses):
+    output = "rapport.xlsx"
+    logging.debug("output excel")
+    with pandas.ExcelWriter(output) as writer:
+        logger.info(f"Lager rapport som {output}")
+        for df,sheet_name in analyses:
+            df.to_df().to_excel(writer, sheet_name=sheet_name)
 
 
 if __name__ == "__main__":
@@ -43,13 +54,14 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="store_const", const=logging.DEBUG, default=logging.INFO)
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument("--csv", action="store_const", const=output_csv, default=output_default, dest="output")
+    output_group.add_argument("--excel", action="store_const", const=output_excel, dest="output")
 
     args = parser.parse_args()
     logging.basicConfig(level=args.verbose)
 
     logger.debug(f"Starting analysis program, file: {args.filename}")
     if not os.path.isfile(args.filename):
-        logger.error(f"Could not find file '{args.filename}'")
+        logger.error(f"Finner ikke fil '{args.filename}'")
         sys.exit(1)
 
     logger.debug(f"Connecting to db {DB_FILE}")
@@ -61,6 +73,5 @@ if __name__ == "__main__":
             data = [hotspots(con),
                     trends(con)]
 
-            for analysis in data:
-                args.output(analysis)
-            
+            args.output(data)
+
