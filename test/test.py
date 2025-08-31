@@ -65,6 +65,8 @@ class TestRequirements(unittest.TestCase):
                 expected = 1
                 self.assertEqual(actual, expected)
 
+        os.remove(test_file)
+
     def test_duplicates_with_null_date(self):
         """
         Rows are only duplicates if the entire row is the same in the csv file
@@ -87,6 +89,8 @@ class TestRequirements(unittest.TestCase):
                 expected = 2
                 self.assertEqual(actual, expected)
 
+        os.remove(test_file)
+
     def test_get_innbruddsdato_from_mottatt_tid_if_null(self):
         """
         Test that the date used is picked from mottatt tid if missing
@@ -107,3 +111,5 @@ class TestRequirements(unittest.TestCase):
                 actual, = con.sql("SELECT innbruddsdato FROM innbruddstips").fetchone()
                 expected = datetime.date(2025,4,4)
                 self.assertEqual(actual, expected)
+
+        os.remove(test_file)
