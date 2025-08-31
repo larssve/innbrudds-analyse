@@ -2,6 +2,7 @@ import unittest
 import duckdb
 import csv
 import os
+import datetime
 
 from analyse import INIT_DB
 
@@ -84,4 +85,25 @@ class TestRequirements(unittest.TestCase):
 
                 actual, = con.sql("SELECT COUNT(*) FROM innbruddstips").fetchone()
                 expected = 2
+                self.assertEqual(actual, expected)
+
+    def test_get_innbruddsdato_from_mottatt_tid_if_null(self):
+        """
+        Test that the date used is picked from mottatt tid if missing
+        """
+        test_file = "test/test-duplicates.csv"
+
+        with open(INIT_DB, "r") as sql_file:
+            sql = sql_file.read()
+
+            with open(test_file, "w") as csvfile:
+                w = csv.writer(csvfile)
+                w.writerow(["mottatt_tid", "innbruddsdato", "stedsnavn"])
+                w.writerow(["2025-04-04T21:10:00Z",None,"Bislett"])
+
+            with duckdb.connect() as con:
+                con.execute(sql, {"csv_file": test_file})
+
+                actual, = con.sql("SELECT innbruddsdato FROM innbruddstips").fetchone()
+                expected = datetime.date(2025,4,4)
                 self.assertEqual(actual, expected)
