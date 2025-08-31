@@ -22,6 +22,14 @@ def sql_from_file(filename, con):
     with open(filename, "r") as f:
         return con.sql(f.read())
 
+def handle_default(df):
+    logging.debug("handle_default")
+    df.show()
+    
+def handle_csv(df):
+    logging.debug("handle_csv")
+    df.show()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -31,10 +39,11 @@ if __name__ == "__main__":
     
     parser.add_argument("filename")
     parser.add_argument("-v", "--verbose", action="store_const", const=logging.DEBUG, default=logging.INFO)
+    output_group = parser.add_mutually_exclusive_group()
+    output_group.add_argument("--csv", action="store_const", const=handle_csv, default=handle_default, dest="output")
+
     args = parser.parse_args()
-
     logging.basicConfig(level=args.verbose)
-
 
     logger.debug(f"Starting analysis program, file: {args.filename}")
     if not os.path.isfile(args.filename):
@@ -47,6 +56,9 @@ if __name__ == "__main__":
             logger.debug(f"Initializing db")
             con.execute(sql.read(), {"csv_file": args.filename})
 
-        hotspots(con).show()
-        trends(con).show()
-    
+            data = [hotspots(con),
+                    trends(con)]
+
+            for analysis in data:
+                args.output(analysis)
+            
