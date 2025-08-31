@@ -1,17 +1,19 @@
 #!venv/bin/python3
 import argparse
 import duckdb
+import logging
 
 DB_FILE = "db.duck"
 INIT_DB = "sql/init_db.sql"
 
+logger = logging.getLogger(__name__)
 
 def hotspots(con):
-    vprint("[*] Starting hotspot analysis")
+    logger.debug("Starting hotspot analysis")
     return sql_from_file("sql/hotspots.sql", con)
 
 def trends(con):
-    vprint("[*] Starting trend analysis")
+    logger.debug("Starting trend analysis")
     return sql_from_file("sql/trends.sql", con)
 
 def sql_from_file(filename, con):
@@ -26,21 +28,19 @@ if __name__ == "__main__":
     )
     
     parser.add_argument("filename")
-    parser.add_argument("-v", "--verbose", action="store_true")
-
+    parser.add_argument("-v", "--verbose", action="store_const", const=logging.DEBUG, default=logging.INFO)
     args = parser.parse_args()
 
-    # print function for verbose mode
-    vprint = print if args.verbose else lambda *p : None
+    logging.basicConfig(level=args.verbose)
 
-    vprint(f"[*] Starting analysis program, file: {args.filename}")
+    logger.debug(f"Starting analysis program, file: {args.filename}")
 
     # check if input file exists os.path.isfile(args.filename)
 
-    vprint(f"[*] Connecting to db {DB_FILE}")
+    logger.debug(f"Connecting to db {DB_FILE}")
     with duckdb.connect(DB_FILE) as con:
         with open(INIT_DB, "r") as sql:
-            vprint(f"[*] Initializing db")
+            logger.debug(f"Initializing db")
             con.execute(sql.read(), {"csv_file": args.filename})
 
         hotspots(con).show()
