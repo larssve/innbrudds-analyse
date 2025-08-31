@@ -2,6 +2,8 @@
 import argparse
 import duckdb
 import logging
+import os
+import sys
 
 DB_FILE = "db.duck"
 INIT_DB = "sql/init_db.sql"
@@ -33,9 +35,11 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=args.verbose)
 
-    logger.debug(f"Starting analysis program, file: {args.filename}")
 
-    # check if input file exists os.path.isfile(args.filename)
+    logger.debug(f"Starting analysis program, file: {args.filename}")
+    if not os.path.isfile(args.filename):
+        logger.error(f"Could not find file '{args.filename}'")
+        sys.exit(1)
 
     logger.debug(f"Connecting to db {DB_FILE}")
     with duckdb.connect(DB_FILE) as con:
