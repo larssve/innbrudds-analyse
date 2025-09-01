@@ -11,6 +11,9 @@
 `./analyse.py --excel <fil>`
 *** lyst på CSV-filer per analyse?
 `./analyse.py --csv <fil>`
+*** interaktivt kart
+`./analyse.py --with-map <fil>`
+`firefox hotspots.html`
 
 * antagelser
 input er en csv fil, output er en rapport. Jeg velger å tolke rapport
