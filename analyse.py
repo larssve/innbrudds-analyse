@@ -6,6 +6,7 @@ import sys
 
 import duckdb
 import pandas
+import geopandas
 
 DB_FILE = "db.duck"
 INIT_DB = "sql/init_db.sql"
@@ -45,6 +46,24 @@ def output_excel(analyses):
         for df,sheet_name in analyses:
             df.to_df().to_excel(writer, sheet_name=sheet_name)
 
+# maps
+def create_map(hotspot_analysis):
+    output = "hotspots.html"
+    res,_ = hotspot_analysis
+    hotspots = dict(res.fetchall())
+
+    # delbydeler fra https://www.oslo.kommune.no/statistikk/geografiske-inndelinger/
+    gdf = geopandas.read_file("resources/delbydeler.geojson", columns=["BYDELSNAVN", "DELBYDELSN"])
+    gdf = gdf[
+        gdf["BYDELSNAVN"].str.lower().isin(hotspots.keys()) |
+        gdf["DELBYDELSN"].str.lower().isin(hotspots.keys())
+        ]
+
+    gdf["ANTALL INNBRUDDSTIPS"] = gdf["DELBYDELSN"].str.lower().map(hotspots).fillna(gdf["BYDELSNAVN"].str.lower().map(hotspots))
+    gdf["ANTALL INNBRUDDSTIPS"] = gdf["ANTALL INNBRUDDSTIPS"].astype("int64")
+
+    logger.info("Skriver interaktivt kart til %s", output)
+    gdf.explore("ANTALL INNBRUDDSTIPS").save(output)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -58,6 +77,8 @@ if __name__ == "__main__":
     output_group.add_argument("--csv", action="store_const", const=output_csv, dest="output")
     output_group.add_argument("--excel", action="store_const", const=output_excel, dest="output")
     output_group.set_defaults(output=output_default)
+
+    parser.add_argument("--with-map", action="store_true")
 
     args = parser.parse_args()
     logging.basicConfig(level=args.verbose)
@@ -75,5 +96,8 @@ if __name__ == "__main__":
 
             data = [hotspots(con),
                     trends(con)]
+
+            if args.with_map:
+                create_map(hotspots(con))
 
             args.output(data)
