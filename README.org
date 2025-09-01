@@ -1,6 +1,18 @@
 #+OPTIONS: ^:nil
-* Tanker mens jeg løser oppgaven
-** Initielle observasjoner og antagelser
+* kjør kode
+** utskrift i terminalen
+`python -m venv venv`
+`source venv/bin/activate`
+`pip install -r requirements.txt`
+`chmod +x analyse.py`
+`./analyse.py <fil>`
+** alternativer
+*** lag en excel-rapport
+`./analyse.py --excel <fil>`
+*** lyst på CSV-filer per analyse?
+`./analyse.py --csv <fil>`
+
+* antagelser
 input er en csv fil, output er en rapport. Jeg velger å tolke rapport
 som en fil som skal leses av mennesker. Det er en vid tolkning som gir
 meg rom i starten til å utforske.
