@@ -1,20 +1,27 @@
 #+OPTIONS: ^:nil
 * kjør kode
 ** utskrift i terminalen
-`python -m venv venv`
-`source venv/bin/activate`
-`pip install -r requirements.txt`
-`chmod +x analyse.py`
-`./analyse.py <fil>`
+#+BEGIN_SRC bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+chmod +x analyse.py
+./analyse.py <fil>
+#+END_SRC
 ** alternativer
 *** lag en excel-rapport
-`./analyse.py --excel <fil>`
+#+BEGIN_SRC bash
+./analyse.py --excel <fil>
+#+END_SRC
 *** lyst på CSV-filer per analyse?
-`./analyse.py --csv <fil>`
+#+BEGIN_SRC bash
+./analyse.py --csv <fil>
+#+END_SRC
 *** interaktivt kart
-`./analyse.py --with-map <fil>`
-`firefox hotspots.html`
-
+#+BEGIN_SRC bash
+./analyse.py --with-map <fil>
+firefox hotspots.html
+#+END_SRC
 * antagelser
 input er en csv fil, output er en rapport. Jeg velger å tolke rapport
 som en fil som skal leses av mennesker. Det er en vid tolkning som gir
